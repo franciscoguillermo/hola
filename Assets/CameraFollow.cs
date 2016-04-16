@@ -20,7 +20,7 @@ public class CameraFollow : MonoBehaviour
 
     [SerializeField]
     private Camera _camera;
-    private float _smoothFactor = 20.0f;
+    private float _smoothFactor = 10.0f;
 
     void Awake()
     {

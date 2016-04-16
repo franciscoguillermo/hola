@@ -14,18 +14,18 @@ public class Shapeshifter : MonoBehaviour
     // All Forms Stuff
     private AnimalForms _form = AnimalForms.Wolf;
     private Vector3 _velocity;
+    private bool _shapeshiftInProgress;
+    private float _shapeshiftDuration = 0.5f;
+
+    [SerializeField]
+    private AnimationCurve _easeInCurve;
+    [SerializeField]
+    private AnimationCurve _easeOutCurve;
 
     // Wolf Stuff
     [SerializeField]
-    private Transform[] _wolfFrontTransforms;
-    private float _wolfFrontAngle;
-    [SerializeField]
-    private Transform _wolfFrontRayOrigin;
-    [SerializeField]
-    private Transform[] _wolfBackTransforms;
-    private float _wolfBackAngle;
-    [SerializeField]
-    private Transform _wolfBackRayOrigin;
+    private Transform _wolfTransform;
+    private float _wolfAngle;
 
     private Vector3 _wolfGravity = new Vector3(0, -60);
     private bool _wolfGrounded;
@@ -34,8 +34,18 @@ public class Shapeshifter : MonoBehaviour
     private float _wolfJumpSpeed = 14.0f;
     private float _wolfJumpSustainFactor = .4f;
     private float _wolfGroundRotSmoothFactor = 10.0f;
-    private float _wolfAirRotSmoothFactor = 2.0f;
+    private float _wolfAirRotSmoothFactor = 5.0f;
     private float _wolfBaseRunSpeed = 14.0f;
+
+    // Bird Stuff
+    [SerializeField]
+    private Transform _birdTransform;
+    private Vector3 _birdGravity = new Vector3(0, -20);
+    private Vector3 _birdAscendingSpeed = new Vector3(0, 30);
+
+    // Fish Stuff
+    [SerializeField]
+    private Transform _fishTransform;
 
     void Awake()
     {
@@ -53,6 +63,7 @@ public class Shapeshifter : MonoBehaviour
                 }
             case AnimalForms.Bird:
                 {
+                    BirdUpdate();
                     break;
                 }
             case AnimalForms.Fish:
@@ -67,6 +78,70 @@ public class Shapeshifter : MonoBehaviour
     void AllFormsUpdate()
     {
         transform.Translate(_velocity * Time.deltaTime);
+
+        if (Input.GetButtonDown("Cycle Right"))
+            CycleForms();
+    }
+
+    void CycleForms()
+    {
+        Transform shiftingOut = null;
+
+        switch (_form)
+        {
+            case AnimalForms.Wolf:
+                shiftingOut = _wolfTransform;
+                break;
+            case AnimalForms.Bird:
+                shiftingOut = _birdTransform;
+                break;
+            case AnimalForms.Fish:
+                shiftingOut = _fishTransform;
+                break;
+        }
+
+        if (_shapeshiftInProgress)
+            return;
+
+        _form++;
+        if ((int)_form >= (int)AnimalForms.Fish)
+            _form = 0;
+
+        Transform shiftingIn = null;
+
+        switch (_form)
+        {
+            case AnimalForms.Wolf:
+                shiftingIn = _wolfTransform;
+                break;
+            case AnimalForms.Bird:
+                shiftingIn = _birdTransform;
+                break;
+            case AnimalForms.Fish:
+                shiftingIn = _fishTransform;
+                break;
+        }
+
+        StartCoroutine(ShapeShiftAsync(shiftingIn, shiftingOut));
+    }
+
+    IEnumerator ShapeShiftAsync(Transform shiftingIn, Transform shiftingOut)
+    {
+        _shapeshiftInProgress = true;
+        shiftingIn.gameObject.SetActive(true);
+
+        for (float t = 0; t < _shapeshiftDuration; t += Time.deltaTime)
+        {
+            float normalT = t / _shapeshiftDuration;
+
+            shiftingIn.localScale = Vector3.one * _easeInCurve.Evaluate(normalT);
+            shiftingOut.localScale = Vector3.one * _easeOutCurve.Evaluate(normalT);
+
+            yield return null;
+        }
+
+        shiftingOut.gameObject.SetActive(false);
+        _shapeshiftInProgress = false;
     }
 
     void WolfFormUpdate()
@@ -108,33 +183,30 @@ public class Shapeshifter : MonoBehaviour
 
     void WolfRotation()
     {
+        RaycastHit2D hit = Physics2D.Raycast(_wolfTransform.position, Vector2.down, _wolfGroundCheck);
+
         if (_wolfGrounded)
-        {
-            // Front
-            RaycastHit2D hit = Physics2D.Raycast(_wolfFrontRayOrigin.position, Vector2.down, _wolfGroundCheck);
-            float angle = (Mathf.Acos(Vector3.Cross(Vector3.down, hit.normal).z) * Mathf.Rad2Deg) - 90;
-            _wolfFrontAngle = Mathf.Lerp(_wolfFrontAngle, angle, Time.deltaTime * _wolfGroundRotSmoothFactor);
+            _wolfTransform.up = Vector3.Lerp(_wolfTransform.up, hit.normal, Time.deltaTime * _wolfGroundRotSmoothFactor);
+        else
+            _wolfTransform.up = Vector3.Lerp(_wolfTransform.up, Vector3.up, Time.deltaTime * _wolfAirRotSmoothFactor);
+    }
 
-            for (int i = 0; i < _wolfFrontTransforms.Length; i++)
-                _wolfFrontTransforms[i].localEulerAngles = new Vector3(0, 0, _wolfFrontAngle / _wolfFrontTransforms.Length);
+    void BirdUpdate()
+    {
+        BirdGravity();
+    }
 
-            // Back
-            hit = Physics2D.Raycast(_wolfFrontRayOrigin.position, Vector2.down, _wolfGroundCheck);
-            angle = (Mathf.Acos(Vector3.Cross(Vector3.down, hit.normal).z) * Mathf.Rad2Deg) - 90;
-            _wolfBackAngle = Mathf.Lerp(_wolfBackAngle, angle, Time.deltaTime * _wolfGroundRotSmoothFactor);
-
-            for (int i = 0; i < _wolfBackTransforms.Length; i++)
-                _wolfBackTransforms[i].localEulerAngles = new Vector3(0, 0, _wolfFrontAngle / _wolfBackTransforms.Length);
-        }
-        //   _wolfTransform.up = Vector3.Lerp(_wolfTransform.up, hit.normal, Time.deltaTime * _wolfGroundRotSmoothFactor);
-        //else
-        //    _wolfTransform.up = Vector3.Lerp(_wolfTransform.up, Vector3.up, Time.deltaTime * _wolfAirRotSmoothFactor);
+    void BirdGravity()
+    {
+        if (Input.GetButton("Primary Action"))
+            _velocity += _birdAscendingSpeed * Time.deltaTime;
+        else
+            _velocity += _birdGravity * Time.deltaTime;
     }
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(_wolfFrontRayOrigin.position, _wolfFrontRayOrigin.position + Vector3.down * _wolfGroundCheck);
-        Gizmos.DrawLine(_wolfBackRayOrigin.position, _wolfBackRayOrigin.position + Vector3.down * _wolfGroundCheck);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(_wolfTransform.position, _wolfTransform.position + Vector3.down * _wolfGroundCheck);
     }
 }

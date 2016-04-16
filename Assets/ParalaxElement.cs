@@ -7,20 +7,22 @@ public class ParalaxElement : MonoBehaviour
     public Transform First;
     public Transform Second;
     public Transform Target;
+    public float YOffset;
 
-    [Range (0,1)]
-    public float ParalaxFactor;
+    [Range(0, 1)]
+    public float ParallaxXFactor;
+    public float ParallaxYFactor;
     private float _width = 32;
+    private int _loopCount = 0;
 
-	void Update ()
-	{
-        First.position = Target.position * ParalaxFactor + Vector3.forward;
-        Second.position = Target.position * ParalaxFactor + Vector3.forward;
+    void Update()
+    {
+        Vector3 newPostion = new Vector3(Target.position.x * ParallaxXFactor + _width * _loopCount, Target.position.y * ParallaxYFactor + YOffset, 1);
 
-        if (First.position.x < CameraFollow.LeftEdge - _width/2)
-            First.position += Vector3.right * _width;
+        First.position = newPostion;
+        Second.position = First.position + new Vector3(_width, 0);
 
-        if (Second.position.x < CameraFollow.LeftEdge - _width/2)
-            Second.position += Vector3.right * _width;
+        if (First.position.x < CameraFollow.LeftEdge - _width / 2)
+            _loopCount++;
     }
 }

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: d561a0cc97fe5c946b8480530f041f02
-timeCreated: 1460786960
+timeCreated: 1460828771
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -15,6 +15,9 @@ TextureImporter:
     21300016: wolf_back_segment_0
     21300018: wolf_back_segment_1
     21300020: wolf_back_segment_2
+    21300022: bird_body
+    21300024: bird_head
+    21300026: bird_wing
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -145,7 +148,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 164
-        y: 278
+        y: 279
         width: 127
         height: 113
       alignment: 9
@@ -170,6 +173,36 @@ TextureImporter:
         height: 114
       alignment: 9
       pivot: {x: .907491922, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bird_body
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 212
+        width: 170
+        height: 52
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bird_head
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 207
+        width: 79
+        height: 48
+      alignment: 9
+      pivot: {x: .116451219, y: .515781701}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bird_wing
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 43
+        width: 101
+        height: 159
+      alignment: 9
+      pivot: {x: .515000224, y: .0616932996}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
