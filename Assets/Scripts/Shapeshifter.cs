@@ -11,23 +11,40 @@ public enum AnimalForms
 
 public class Shapeshifter : MonoBehaviour
 {
+    public Vector3 Velocity
+    {
+        get
+        {
+            return _velocity;
+        }
+    }
+
     // All Forms Stuff
     private AnimalForms _form = AnimalForms.Fox;
     private Vector3 _velocity;
     private bool _shapeshiftInProgress;
     private float _shapeshiftDuration = 0.5f;
     private float _xVelocitySmoothFactor = 10.0f;
-    private float _landXSpeed = 16.0f;
-    private float _waterXSpeed = 10.0f;
+    private float _landXSpeed = 14.0f;
+    private float _waterXSpeed = 12.0f;
     [SerializeField]
     private Transform _cameraTarget;
     private float _cameraSmoothFactor = 10.0f;
     private bool _dead = false;
     private bool _underwater = false;
     private float _waterTensionVelocityFactor = 0.5f;
+    private float _worldCeil = 4.8f;
+    private float _ceilingBounceCoef = 0.5f;
+    private float _worldFloor = -20.0f;
+    private float _floorBounceCoef = .75f;
 
     [SerializeField]
-    private GameObject _deathEffectPrefab;
+    private GameObject _foxDeathEffectPrefab;
+    [SerializeField]
+    private GameObject _birdDeathEffectPrefab;
+    [SerializeField]
+    private GameObject _fishDeathEffectPrefab;
+
     [SerializeField]
     private InkEffect _inkEffect;
 
@@ -42,6 +59,8 @@ public class Shapeshifter : MonoBehaviour
     // Fox Stuff
     [SerializeField]
     private Transform _foxTransform;
+    [SerializeField]
+    private ParticleSystem _foxTail;
     private Vector3 _foxGravity = new Vector3(0, -60);
     private bool _foxGrounded;
     private float _foxGroundCheck = 1.0f;
@@ -50,31 +69,32 @@ public class Shapeshifter : MonoBehaviour
     private float _foxJumpSustainFactor = .6f;
     private float _foxGroundRotSmoothFactor = 10.0f;
     private float _foxAirRotSmoothFactor = 5.0f;
-    private float _foxBaseRunSpeed = 14.0f;
     private Vector3 _foxCameraOffset = new Vector3(10, 3);
-    private float _foxWorldFloor = -5;
-    private float _foxWorldCeil = -3;
+    private float _foxCameraFloor = -11;
+    private float _foxCameraCeil = -3;
 
     // Bird Stuff
     [SerializeField]
     private Transform _birdTransform;
+    [SerializeField]
+    private ParticleSystem _birdTail;
     private Vector3 _birdGravity = new Vector3(0, -20);
     private Vector3 _birdAscendingSpeed = new Vector3(0, 30);
-    private float _birdCameraFloor = -5;
+    private float _birdCameraFloor = -11;
     private float _birdCameraCeil = -3;
-    private float _birdWorldCeil = 4.8f;
-    private float _birdBounceCoef = 0.5f;
     private Vector3 _birdCameraOffset = new Vector3(10, -3);
 
     // Fish Stuff
     [SerializeField]
     private Transform _fishTransform;
+    [SerializeField]
+    private ParticleSystem _fishTail;
     private Vector3 _fishBouyancy = new Vector3(0, 60);
     private Vector3 _fishGravity = new Vector3(0, -60);
     private Vector3 _fishDivingSpeed = new Vector3(0, -80);
-    private Vector3 _fishCameraOffset = new Vector3(10, -5);
-    private float _fishCameraFloor = -10;
-    private float _fishCameraCeil = -5;
+    private Vector3 _fishCameraOffset = new Vector3(10, -4);
+    private float _fishCameraFloor = -11;
+    private float _fishCameraCeil = -4;
     private float _fishRotSmoothFactor = 10.0f;
 
     void Update()
@@ -120,13 +140,15 @@ public class Shapeshifter : MonoBehaviour
         else if (Input.GetButtonDown("Cycle Left"))
             CycleForms(-1);
 
-        CeilingBounce();
+        CeilingUpdate();
+        FloorUpdate();
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("DeathTrigger"))
             Die();
+
     }
 
     void OnTriggerStay2D(Collider2D other)
@@ -155,7 +177,22 @@ public class Shapeshifter : MonoBehaviour
     {
         if (!_postShiftInvicibilityActive && !_dead)
         {
-            GameObject deathEffect = ObjectPool.Pop(_deathEffectPrefab);
+            GameObject prefab = null;
+
+            switch (_form)
+            {
+                case AnimalForms.Fox:
+                    prefab = _foxDeathEffectPrefab;
+                    break;
+                case AnimalForms.Bird:
+                    prefab = _birdDeathEffectPrefab;
+                    break;
+                case AnimalForms.Fish:
+                    prefab = _fishDeathEffectPrefab;
+                    break;
+            }
+
+            GameObject deathEffect = ObjectPool.Pop(prefab);
             deathEffect.SetActive(true);
             deathEffect.transform.position = transform.position;
             deathEffect.transform.up = _velocity.normalized;
@@ -179,29 +216,32 @@ public class Shapeshifter : MonoBehaviour
 
     void CycleForms(int dir)
     {
+        if (_shapeshiftInProgress)
+            return;
+
         Transform shiftingOut = null;
 
         switch (_form)
         {
             case AnimalForms.Fox:
                 shiftingOut = _foxTransform;
+                _foxTail.Stop();
                 break;
             case AnimalForms.Bird:
                 shiftingOut = _birdTransform;
+                _birdTail.Stop();
                 break;
             case AnimalForms.Fish:
                 shiftingOut = _fishTransform;
+                _fishTail.Stop();
                 break;
         }
 
-        if (_shapeshiftInProgress)
-            return;
-
         _form += dir;
 
-        if ((int)_form > (int)AnimalForms.Fish)
+        if (_form > AnimalForms.Fish)
             _form = AnimalForms.Fox;
-        else if ((int)_form < (int)AnimalForms.Fox)
+        else if (_form < AnimalForms.Fox)
             _form = AnimalForms.Fish;
 
         Transform shiftingIn = null;
@@ -210,22 +250,36 @@ public class Shapeshifter : MonoBehaviour
         {
             case AnimalForms.Fox:
                 shiftingIn = _foxTransform;
+                _foxTail.Play();
                 break;
             case AnimalForms.Bird:
                 shiftingIn = _birdTransform;
+                _birdTail.Play();
                 break;
             case AnimalForms.Fish:
                 shiftingIn = _fishTransform;
+                _fishTail.Play();
                 break;
         }
 
         StartCoroutine(ShapeShiftAsync(shiftingIn, shiftingOut));
     }
 
-    void CeilingBounce()
+    void CeilingUpdate()
     {
-        if (transform.position.y > _birdWorldCeil && _velocity.y > 0)
-            _velocity.y = -_velocity.y * _birdBounceCoef;
+        if (transform.position.y > _worldCeil && _velocity.y > 0)
+            _velocity.y = -_velocity.y * _ceilingBounceCoef;
+    }
+
+    void FloorUpdate()
+    {
+        if (transform.position.y < _worldFloor && _velocity.y < 0)
+        {
+            if (_form == AnimalForms.Fish)
+                _velocity.y = -_velocity.y * _floorBounceCoef;
+            else
+                Die();
+        }
     }
 
     IEnumerator ShapeShiftAsync(Transform shiftingIn, Transform shiftingOut)
@@ -277,7 +331,7 @@ public class Shapeshifter : MonoBehaviour
     void FoxCameraTarget()
     {
         Vector3 targetPos = _foxTransform.position + _foxCameraOffset;
-        targetPos.y = Mathf.Clamp(targetPos.y, _foxWorldFloor, _foxWorldCeil);
+        targetPos.y = Mathf.Clamp(targetPos.y, _foxCameraFloor, _foxCameraCeil);
 
         _cameraTarget.position = Vector3.Lerp(_cameraTarget.position, targetPos, Time.deltaTime * _cameraSmoothFactor);
     }
