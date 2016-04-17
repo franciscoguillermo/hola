@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: d561a0cc97fe5c946b8480530f041f02
-timeCreated: 1460828771
+timeCreated: 1460858583
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -18,6 +18,9 @@ TextureImporter:
     21300022: bird_body
     21300024: bird_head
     21300026: bird_wing
+    21300028: fish_front
+    21300030: fish_mid
+    21300032: fish_head
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -203,6 +206,36 @@ TextureImporter:
         height: 159
       alignment: 9
       pivot: {x: .515000224, y: .0616932996}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: fish_front
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 98
+        width: 67
+        height: 175
+      alignment: 9
+      pivot: {x: .940891564, y: .525319815}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: fish_mid
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 79
+        width: 92
+        height: 121
+      alignment: 9
+      pivot: {x: .954868793, y: .337246656}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: fish_head
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 99
+        width: 104
+        height: 104
+      alignment: 9
+      pivot: {x: .0976157561, y: .49053207}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 

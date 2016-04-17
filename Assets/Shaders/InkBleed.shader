@@ -63,7 +63,7 @@
 
 				fixed4 frag(v2f i) : SV_Target
 				{
-					float2 offsetOffset = float2(_SinTime.y, _CosTime.y);
+					float2 offsetOffset = float2(_Time.y * 0.25, _CosTime.y);
 					float2 bleedOffset = (tex2D(_InkBleedMap, i.inkuv + offsetOffset) - 0.25) * 2;
 
 					fixed4 col = tex2D(_PrevFrame, i.uv1 + bleedOffset * _InkBleedMag) + _InkFadeMag;

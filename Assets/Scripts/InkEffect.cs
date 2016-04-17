@@ -7,16 +7,18 @@ public class InkEffect : MonoBehaviour
 {
     public RenderTexture PreviousFrameBuffer;
     public Material InkBleedMaterial;
-    bool tested;
+
+    private float _bleedOutDuration = 3.0f;
+    private float _defaultFadeMagnitude = 0.075f;
+    private float _deathFadeMagnitude = -0.05f;
+
+    void Start()
+    {
+        InkBleedMaterial.SetFloat("_InkFadeMag", _defaultFadeMagnitude);
+    }
 
     void OnRenderImage(RenderTexture src, RenderTexture dst)
     {
-        if (!tested)
-        {
-            tested = true;
-            Graphics.Blit(src, PreviousFrameBuffer);
-        }
-
         RenderTexture temp = RenderTexture.GetTemporary(src.width, src.height, 0);
 
         InkBleedMaterial.SetTexture("_PrevFrame", PreviousFrameBuffer);
@@ -25,5 +27,25 @@ public class InkEffect : MonoBehaviour
         Graphics.Blit(temp, dst);
 
         RenderTexture.ReleaseTemporary(temp);
+    }
+
+    public void BleedOut()
+    {
+        StartCoroutine(BleedOutAsync());
+    }
+
+    IEnumerator BleedOutAsync()
+    {
+        float fade = _defaultFadeMagnitude;
+
+        for (float t = 0; t < _bleedOutDuration; t += Time.deltaTime)
+        {
+            float normalT = t / _bleedOutDuration;
+
+            fade = Mathf.Lerp(_defaultFadeMagnitude, _deathFadeMagnitude, normalT);
+            InkBleedMaterial.SetFloat("_InkFadeMag", fade);
+
+            yield return null;
+        }
     }
 }

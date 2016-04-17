@@ -1,0 +1,185 @@
+fileFormatVersion: 2
+guid: 0c9bf879de7174849965e439760c045b
+timeCreated: 1460850782
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: control_point_00
+    100002: control_point_01
+    100004: control_point_02
+    100006: control_point_020
+    100008: control_point_021
+    100010: control_point_022
+    100012: control_point_023
+    100014: control_point_024
+    100016: control_point_025
+    100018: control_point_026
+    100020: control_point_027
+    100022: control_point_028
+    100024: control_point_029
+    100026: control_point_03
+    100028: control_point_030
+    100030: control_point_031
+    100032: control_point_032
+    100034: control_point_033
+    100036: control_point_034
+    100038: control_point_035
+    100040: control_point_036
+    100042: control_point_037
+    100044: control_point_038
+    100046: control_point_039
+    100048: control_point_04
+    100050: control_point_05
+    100052: control_point_06
+    100054: control_point_07
+    100056: control_point_08
+    100058: control_point_09
+    100060: control_point_10
+    100062: control_point_11
+    100064: control_point_12
+    100066: control_point_13
+    100068: control_point_14
+    100070: control_point_15
+    100072: control_point_16
+    100074: control_point_17
+    100076: control_point_18
+    100078: control_point_19
+    100080: //RootNode
+    100082: control_point_000
+    100084: control_point_001
+    100086: control_point_002
+    100088: control_point_003
+    100090: control_point_004
+    100092: control_point_005
+    100094: control_point_006
+    100096: control_point_007
+    100098: control_point_008
+    100100: control_point_009
+    100102: control_point_010
+    100104: control_point_011
+    100106: control_point_012
+    100108: control_point_013
+    400000: control_point_00
+    400002: control_point_01
+    400004: control_point_02
+    400006: control_point_020
+    400008: control_point_021
+    400010: control_point_022
+    400012: control_point_023
+    400014: control_point_024
+    400016: control_point_025
+    400018: control_point_026
+    400020: control_point_027
+    400022: control_point_028
+    400024: control_point_029
+    400026: control_point_03
+    400028: control_point_030
+    400030: control_point_031
+    400032: control_point_032
+    400034: control_point_033
+    400036: control_point_034
+    400038: control_point_035
+    400040: control_point_036
+    400042: control_point_037
+    400044: control_point_038
+    400046: control_point_039
+    400048: control_point_04
+    400050: control_point_05
+    400052: control_point_06
+    400054: control_point_07
+    400056: control_point_08
+    400058: control_point_09
+    400060: control_point_10
+    400062: control_point_11
+    400064: control_point_12
+    400066: control_point_13
+    400068: control_point_14
+    400070: control_point_15
+    400072: control_point_16
+    400074: control_point_17
+    400076: control_point_18
+    400078: control_point_19
+    400080: //RootNode
+    400082: control_point_000
+    400084: control_point_001
+    400086: control_point_002
+    400088: control_point_003
+    400090: control_point_004
+    400092: control_point_005
+    400094: control_point_006
+    400096: control_point_007
+    400098: control_point_008
+    400100: control_point_009
+    400102: control_point_010
+    400104: control_point_011
+    400106: control_point_012
+    400108: control_point_013
+    4300000: water_plane
+    4300002: Plane001
+    9500000: //RootNode
+    13700000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

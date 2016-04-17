@@ -17,7 +17,7 @@ public class ParalaxElement : MonoBehaviour
 
     void Update()
     {
-        Vector3 newPostion = new Vector3(Target.position.x * ParallaxXFactor + _width * _loopCount, Target.position.y * ParallaxYFactor + YOffset, 1);
+        Vector3 newPostion = new Vector3(Target.position.x * ParallaxXFactor + _width * _loopCount, Target.position.y * ParallaxYFactor + YOffset, 2);
 
         First.position = newPostion;
         Second.position = First.position + new Vector3(_width, 0);
