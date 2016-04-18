@@ -25,7 +25,8 @@ public class RingTrigger : MonoBehaviour
         if (other.transform.root.CompareTag("Player") && other.transform.position.x < transform.position.x)
         {
             _anim.SetBool(_isActiveHash, false);
-            // increase score
+            GameController.Instance.CollectRing();
+            AudioManager.PlayRingChime();
         }
     }
 

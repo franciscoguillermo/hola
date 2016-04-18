@@ -19,6 +19,14 @@ public class Shapeshifter : MonoBehaviour
         }
     }
 
+    public AnimalForms Form
+    {
+        get
+        {
+            return _form;
+        }
+    }
+
     // All Forms Stuff
     private AnimalForms _form = AnimalForms.Fox;
     private Vector3 _velocity;
@@ -35,8 +43,9 @@ public class Shapeshifter : MonoBehaviour
     private float _waterTensionVelocityFactor = 0.5f;
     private float _worldCeil = 4.8f;
     private float _ceilingBounceCoef = 0.5f;
-    private float _worldFloor = -20.0f;
-    private float _floorBounceCoef = .75f;
+    private float _worldFloor = -19.0f;
+    private float _floorBounceCoef = .25f;
+    private bool _hasStarted;
 
     [SerializeField]
     private GameObject _foxDeathEffectPrefab;
@@ -44,9 +53,6 @@ public class Shapeshifter : MonoBehaviour
     private GameObject _birdDeathEffectPrefab;
     [SerializeField]
     private GameObject _fishDeathEffectPrefab;
-
-    [SerializeField]
-    private InkEffect _inkEffect;
 
     private bool _postShiftInvicibilityActive;
     private float _postShiftInvicibilityDuration = 0.1f;
@@ -61,10 +67,14 @@ public class Shapeshifter : MonoBehaviour
     private Transform _foxTransform;
     [SerializeField]
     private ParticleSystem _foxTail;
+    [SerializeField]
+    private Animator _foxAnim;
+    private int _isRunningHash = Animator.StringToHash("IsRunning");
+    private int _isGroundedgHash = Animator.StringToHash("IsGrounded");
     private Vector3 _foxGravity = new Vector3(0, -60);
     private bool _foxGrounded;
     private float _foxGroundCheck = 1.0f;
-    private float _foxHeight = 0.6f;
+    private float _foxHeight = 0.3f;
     private float _foxJumpVelocity = 16.0f;
     private float _foxJumpSustainFactor = .6f;
     private float _foxGroundRotSmoothFactor = 10.0f;
@@ -96,12 +106,31 @@ public class Shapeshifter : MonoBehaviour
     private float _fishCameraFloor = -11;
     private float _fishCameraCeil = -4;
     private float _fishRotSmoothFactor = 10.0f;
+    private float _fishMinWorldBounce = 20.0f;
+
+    void Start()
+    {
+        GameController.OnGameStart += GameController_OnGameStart;
+    }
+
+    void OnDestroy()
+    {
+        GameController.OnGameStart -= GameController_OnGameStart;
+    }
+
+    private void GameController_OnGameStart()
+    {
+        _hasStarted = true;
+        _foxAnim.SetBool(_isRunningHash, true);
+    }
 
     void Update()
     {
-        // Reset Test
-        if (Input.GetKeyDown(KeyCode.R))
-            Application.LoadLevel(0);
+        if (!_hasStarted)
+        {
+            _cameraTarget.position = new Vector3(0, -3);
+            return;
+        }
 
         if (_dead)
             return;
@@ -198,6 +227,8 @@ public class Shapeshifter : MonoBehaviour
             deathEffect.transform.up = _velocity.normalized;
             _dead = true;
 
+            AudioManager.DetuneDeath();
+
             StartCoroutine(DieAsync());
         }
     }
@@ -211,7 +242,7 @@ public class Shapeshifter : MonoBehaviour
             yield return null;
         }
 
-        _inkEffect.BleedOut();
+        GameController.Instance.PostGameScreen();
     }
 
     void CycleForms(int dir)
@@ -248,9 +279,12 @@ public class Shapeshifter : MonoBehaviour
 
         switch (_form)
         {
+            // TODO: FIX THIS GARBAGE
             case AnimalForms.Fox:
                 shiftingIn = _foxTransform;
                 _foxTail.Play();
+                _foxAnim.gameObject.SetActive(true);
+                _foxAnim.SetBool(_isRunningHash, true);
                 break;
             case AnimalForms.Bird:
                 shiftingIn = _birdTransform;
@@ -275,8 +309,8 @@ public class Shapeshifter : MonoBehaviour
     {
         if (transform.position.y < _worldFloor && _velocity.y < 0)
         {
-            if (_form == AnimalForms.Fish)
-                _velocity.y = -_velocity.y * _floorBounceCoef;
+            if (_form == AnimalForms.Fish && _underwater)
+                _velocity.y = _fishMinWorldBounce;
             else
                 Die();
         }
@@ -308,7 +342,7 @@ public class Shapeshifter : MonoBehaviour
     void FoxUpdate()
     {
         FoxGravity();
-        FoxCameraTarget();
+        FoxCameraUpdate();
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, _foxGroundCheck);
         _foxGrounded = hit.collider != null;
@@ -325,10 +359,12 @@ public class Shapeshifter : MonoBehaviour
                 FoxJump();
         }
 
+        _foxAnim.SetBool(_isGroundedgHash, _foxGrounded);
+
         FoxRotation();
     }
 
-    void FoxCameraTarget()
+    void FoxCameraUpdate()
     {
         Vector3 targetPos = _foxTransform.position + _foxCameraOffset;
         targetPos.y = Mathf.Clamp(targetPos.y, _foxCameraFloor, _foxCameraCeil);
@@ -364,12 +400,12 @@ public class Shapeshifter : MonoBehaviour
     {
         BirdGravity();
         BirdGroundDeath();
-        FoxCameraTarget();
+        FoxCameraUpdate();
     }
 
     void BirdGravity()
     {
-        if (Input.GetButton("Primary Action"))
+        if (Input.GetButton("Primary Action") && !_underwater)
             _velocity += _birdAscendingSpeed * Time.deltaTime;
         else
             _velocity += _birdGravity * Time.deltaTime;

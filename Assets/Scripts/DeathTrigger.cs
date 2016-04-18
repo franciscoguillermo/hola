@@ -11,6 +11,6 @@ public class DeathTrigger : MonoBehaviour
         BoxCollider2D box = GetComponent<BoxCollider2D>();
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.DrawCube(Vector3.zero, box.size);
+        Gizmos.DrawCube(Vector3.zero + (Vector3)box.offset, box.size);
     }
 }
