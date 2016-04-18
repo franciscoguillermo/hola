@@ -47,7 +47,7 @@ Material:
       data:
         first:
           name: _InkBleedMag
-        second: .00499999989
+        second: .00200000009
       data:
         first:
           name: _InkFadeMag
